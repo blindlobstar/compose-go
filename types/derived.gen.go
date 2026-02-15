@@ -250,23 +250,11 @@ func deriveDeepCopyService(dst, src *ServiceConfig) {
 		}
 		deriveDeepCopy_10(dst.Configs, src.Configs)
 	}
-	if src.LocalConfigs == nil {
-		dst.LocalConfigs = nil
-	} else {
-		if dst.LocalConfigs != nil {
-			if len(src.LocalConfigs) > len(dst.LocalConfigs) {
-				if cap(dst.LocalConfigs) >= len(src.LocalConfigs) {
-					dst.LocalConfigs = (dst.LocalConfigs)[:len(src.LocalConfigs)]
-				} else {
-					dst.LocalConfigs = make([]LocalConfigConfig, len(src.LocalConfigs))
-				}
-			} else if len(src.LocalConfigs) < len(dst.LocalConfigs) {
-				dst.LocalConfigs = (dst.LocalConfigs)[:len(src.LocalConfigs)]
-			}
-		} else {
-			dst.LocalConfigs = make([]LocalConfigConfig, len(src.LocalConfigs))
-		}
+	if src.LocalConfigs != nil {
+		dst.LocalConfigs = make(map[string]LocalConfigConfig, len(src.LocalConfigs))
 		deriveDeepCopy_11(dst.LocalConfigs, src.LocalConfigs)
+	} else {
+		dst.LocalConfigs = nil
 	}
 	dst.ContainerName = src.ContainerName
 	if src.CredentialSpec == nil {
@@ -659,23 +647,11 @@ func deriveDeepCopyService(dst, src *ServiceConfig) {
 		}
 		deriveDeepCopy_25(dst.Secrets, src.Secrets)
 	}
-	if src.Sensitive == nil {
-		dst.Sensitive = nil
-	} else {
-		if dst.Sensitive != nil {
-			if len(src.Sensitive) > len(dst.Sensitive) {
-				if cap(dst.Sensitive) >= len(src.Sensitive) {
-					dst.Sensitive = (dst.Sensitive)[:len(src.Sensitive)]
-				} else {
-					dst.Sensitive = make([]SensitiveConfig, len(src.Sensitive))
-				}
-			} else if len(src.Sensitive) < len(dst.Sensitive) {
-				dst.Sensitive = (dst.Sensitive)[:len(src.Sensitive)]
-			}
-		} else {
-			dst.Sensitive = make([]SensitiveConfig, len(src.Sensitive))
-		}
+	if src.Sensitive != nil {
+		dst.Sensitive = make(map[string]SensitiveConfig, len(src.Sensitive))
 		deriveDeepCopy_26(dst.Sensitive, src.Sensitive)
+	} else {
+		dst.Sensitive = nil
 	}
 	if src.SecurityOpt == nil {
 		dst.SecurityOpt = nil
@@ -1248,12 +1224,12 @@ func deriveDeepCopy_10(dst, src []ServiceConfigObjConfig) {
 }
 
 // deriveDeepCopy_11 recursively copies the contents of src into dst.
-func deriveDeepCopy_11(dst, src []LocalConfigConfig) {
-	for src_i, src_value := range src {
+func deriveDeepCopy_11(dst, src map[string]LocalConfigConfig) {
+	for src_key, src_value := range src {
 		func() {
 			field := new(LocalConfigConfig)
 			deriveDeepCopy_40(field, &src_value)
-			dst[src_i] = *field
+			dst[src_key] = *field
 		}()
 	}
 }
@@ -1544,12 +1520,12 @@ func deriveDeepCopy_25(dst, src []ServiceSecretConfig) {
 }
 
 // deriveDeepCopy_26 recursively copies the contents of src into dst.
-func deriveDeepCopy_26(dst, src []SensitiveConfig) {
-	for src_i, src_value := range src {
+func deriveDeepCopy_26(dst, src map[string]SensitiveConfig) {
+	for src_key, src_value := range src {
 		func() {
 			field := new(SensitiveConfig)
 			deriveDeepCopy_52(field, &src_value)
-			dst[src_i] = *field
+			dst[src_key] = *field
 		}()
 	}
 }

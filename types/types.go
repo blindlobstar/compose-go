@@ -59,19 +59,19 @@ type ServiceConfig struct {
 	// Set to `[]` or an empty string to clear the command from the image.
 	Command ShellCommand `yaml:"command,omitempty" json:"command"` // NOTE: we can NOT omitempty for JSON! see ShellCommand type for details.
 
-	Configs           []ServiceConfigObjConfig `yaml:"configs,omitempty" json:"configs,omitempty"`
-	LocalConfigs      []LocalConfigConfig      `yaml:"local_configs,omitempty" json:"local_configs,omitempty"`
-	ContainerName     string                   `yaml:"container_name,omitempty" json:"container_name,omitempty"`
-	CredentialSpec    *CredentialSpecConfig    `yaml:"credential_spec,omitempty" json:"credential_spec,omitempty"`
-	DependsOn         DependsOnConfig          `yaml:"depends_on,omitempty" json:"depends_on,omitempty"`
-	Deploy            *DeployConfig            `yaml:"deploy,omitempty" json:"deploy,omitempty"`
-	DeviceCgroupRules []string                 `yaml:"device_cgroup_rules,omitempty" json:"device_cgroup_rules,omitempty"`
-	Devices           []DeviceMapping          `yaml:"devices,omitempty" json:"devices,omitempty"`
-	DNS               StringList               `yaml:"dns,omitempty" json:"dns,omitempty"`
-	DNSOpts           []string                 `yaml:"dns_opt,omitempty" json:"dns_opt,omitempty"`
-	DNSSearch         StringList               `yaml:"dns_search,omitempty" json:"dns_search,omitempty"`
-	Dockerfile        string                   `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
-	DomainName        string                   `yaml:"domainname,omitempty" json:"domainname,omitempty"`
+	Configs           []ServiceConfigObjConfig     `yaml:"configs,omitempty" json:"configs,omitempty"`
+	LocalConfigs      map[string]LocalConfigConfig `yaml:"local_configs,omitempty" json:"local_configs,omitempty"`
+	ContainerName     string                       `yaml:"container_name,omitempty" json:"container_name,omitempty"`
+	CredentialSpec    *CredentialSpecConfig        `yaml:"credential_spec,omitempty" json:"credential_spec,omitempty"`
+	DependsOn         DependsOnConfig              `yaml:"depends_on,omitempty" json:"depends_on,omitempty"`
+	Deploy            *DeployConfig                `yaml:"deploy,omitempty" json:"deploy,omitempty"`
+	DeviceCgroupRules []string                     `yaml:"device_cgroup_rules,omitempty" json:"device_cgroup_rules,omitempty"`
+	Devices           []DeviceMapping              `yaml:"devices,omitempty" json:"devices,omitempty"`
+	DNS               StringList                   `yaml:"dns,omitempty" json:"dns,omitempty"`
+	DNSOpts           []string                     `yaml:"dns_opt,omitempty" json:"dns_opt,omitempty"`
+	DNSSearch         StringList                   `yaml:"dns_search,omitempty" json:"dns_search,omitempty"`
+	Dockerfile        string                       `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
+	DomainName        string                       `yaml:"domainname,omitempty" json:"domainname,omitempty"`
 
 	// Entrypoint for the service containers.
 	// If set, overrides ENTRYPOINT from the image.
@@ -122,7 +122,7 @@ type ServiceConfig struct {
 	Runtime         string                           `yaml:"runtime,omitempty" json:"runtime,omitempty"`
 	Scale           *int                             `yaml:"scale,omitempty" json:"scale,omitempty"`
 	Secrets         []ServiceSecretConfig            `yaml:"secrets,omitempty" json:"secrets,omitempty"`
-	Sensitive       []SensitiveConfig                `yaml:"sensitive,omitempty" json:"sensitive,omitempty"`
+	Sensitive       map[string]SensitiveConfig       `yaml:"sensitive,omitempty" json:"sensitive,omitempty"`
 	SecurityOpt     []string                         `yaml:"security_opt,omitempty" json:"security_opt,omitempty"`
 	ShmSize         UnitBytes                        `yaml:"shm_size,omitempty" json:"shm_size,omitempty"`
 	StdinOpen       bool                             `yaml:"stdin_open,omitempty" json:"stdin_open,omitempty"`
@@ -886,17 +886,17 @@ func (s ConfigObjConfig) MarshalJSON() ([]byte, error) {
 
 // PrebuildCommand represents a single command in a prebuild job
 type PrebuildCommand struct {
-	Name    string     `yaml:"name,omitempty" json:"name,omitempty"`
-	Command string     `yaml:"command,omitempty" json:"command,omitempty"`
+	Name       string     `yaml:"name,omitempty" json:"name,omitempty"`
+	Command    string     `yaml:"command,omitempty" json:"command,omitempty"`
 	Extensions Extensions `yaml:"#extensions,inline,omitempty" json:"-"`
 }
 
 // PrebuildJob represents a job that runs before building the Docker image
 type PrebuildJob struct {
-	Name       string             `yaml:"name,omitempty" json:"name,omitempty"`
-	RunsOn     string             `yaml:"runs-on,omitempty" json:"runs-on,omitempty"`
-	Commands   []PrebuildCommand  `yaml:"commands,omitempty" json:"commands,omitempty"`
-	Extensions Extensions         `yaml:"#extensions,inline,omitempty" json:"-"`
+	Name       string            `yaml:"name,omitempty" json:"name,omitempty"`
+	RunsOn     string            `yaml:"runs-on,omitempty" json:"runs-on,omitempty"`
+	Commands   []PrebuildCommand `yaml:"commands,omitempty" json:"commands,omitempty"`
+	Extensions Extensions        `yaml:"#extensions,inline,omitempty" json:"-"`
 }
 
 // SensitiveSecret represents a secret reference in a sensitive config

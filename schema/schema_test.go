@@ -255,12 +255,12 @@ func TestValidateLocalConfigs(t *testing.T) {
 		"services": map[string]any{
 			"web": map[string]any{
 				"image": "nginx",
-				"local_configs": []any{
-					map[string]any{
+				"local_configs": map[string]any{
+					"nginx_conf": map[string]any{
 						"source": "./configs/nginx.conf",
 						"target": "/etc/nginx/nginx.conf",
 					},
-					map[string]any{
+					"app_config": map[string]any{
 						"source": "./app/config.yaml",
 						"target": "/app/config.yaml",
 						"uid":    "1000",
@@ -281,8 +281,8 @@ func TestValidatePrebuild(t *testing.T) {
 				"image": "node:18",
 				"prebuild": []any{
 					map[string]any{
-						"name":     "Test Suite",
-						"runs-on":  "node:18",
+						"name":    "Test Suite",
+						"runs-on": "node:18",
 						"commands": []any{
 							map[string]any{
 								"name":    "Install dependencies",
@@ -306,8 +306,8 @@ func TestValidateSensitive(t *testing.T) {
 		"services": map[string]any{
 			"db": map[string]any{
 				"image": "postgres:15",
-				"sensitive": []any{
-					map[string]any{
+				"sensitive": map[string]any{
+					"app_env": map[string]any{
 						"target": "/app/.env",
 						"format": "env",
 						"secrets": []any{
@@ -336,8 +336,8 @@ func TestValidateCicdezFieldsCombined(t *testing.T) {
 		"services": map[string]any{
 			"app": map[string]any{
 				"image": "myapp:latest",
-				"local_configs": []any{
-					map[string]any{
+				"local_configs": map[string]any{
+					"app_config": map[string]any{
 						"source": "./config.yaml",
 						"target": "/app/config.yaml",
 					},
@@ -353,8 +353,8 @@ func TestValidateCicdezFieldsCombined(t *testing.T) {
 						},
 					},
 				},
-				"sensitive": []any{
-					map[string]any{
+				"sensitive": map[string]any{
+					"app_env": map[string]any{
 						"target": "/app/.env",
 						"format": "env",
 						"secrets": []any{

@@ -30,9 +30,11 @@ services:
   web:
     image: nginx
     local_configs:
-      - source: ./configs/nginx.conf
+      nginx_conf:
+        source: ./configs/nginx.conf
         target: /etc/nginx/nginx.conf
-      - source: ./app/config.yaml
+      app_config:
+        source: ./app/config.yaml
         target: /app/config.yaml
         uid: "1000"
         gid: "1000"
@@ -43,12 +45,12 @@ services:
 
 	service := actual.Services["web"]
 	assert.Check(t, is.Len(service.LocalConfigs, 2))
-	assert.Check(t, is.Equal("./configs/nginx.conf", service.LocalConfigs[0].Source))
-	assert.Check(t, is.Equal("/etc/nginx/nginx.conf", service.LocalConfigs[0].Target))
-	assert.Check(t, is.Equal("./app/config.yaml", service.LocalConfigs[1].Source))
-	assert.Check(t, is.Equal("/app/config.yaml", service.LocalConfigs[1].Target))
-	assert.Check(t, is.Equal("1000", service.LocalConfigs[1].UID))
-	assert.Check(t, is.Equal("1000", service.LocalConfigs[1].GID))
+	assert.Check(t, is.Equal("./configs/nginx.conf", service.LocalConfigs["nginx_conf"].Source))
+	assert.Check(t, is.Equal("/etc/nginx/nginx.conf", service.LocalConfigs["nginx_conf"].Target))
+	assert.Check(t, is.Equal("./app/config.yaml", service.LocalConfigs["app_config"].Source))
+	assert.Check(t, is.Equal("/app/config.yaml", service.LocalConfigs["app_config"].Target))
+	assert.Check(t, is.Equal("1000", service.LocalConfigs["app_config"].UID))
+	assert.Check(t, is.Equal("1000", service.LocalConfigs["app_config"].GID))
 }
 
 func TestLoadPrebuild(t *testing.T) {
@@ -100,7 +102,8 @@ services:
   db:
     image: postgres:15
     sensitive:
-      - target: /app/.env
+      app_env:
+        target: /app/.env
         format: env
         secrets:
           - source: db_password
@@ -110,7 +113,8 @@ services:
         uid: "1000"
         gid: "1000"
         mode: 0440
-      - target: /run/secrets/postgres_password
+      postgres_password:
+        target: /run/secrets/postgres_password
         format: raw
         secrets:
           - source: db_password
@@ -125,22 +129,22 @@ services:
 	assert.Check(t, is.Len(service.Sensitive, 2))
 
 	// First sensitive config (env format)
-	assert.Check(t, is.Equal("/app/.env", service.Sensitive[0].Target))
-	assert.Check(t, is.Equal("env", service.Sensitive[0].Format))
-	assert.Check(t, is.Len(service.Sensitive[0].Secrets, 2))
-	assert.Check(t, is.Equal("db_password", service.Sensitive[0].Secrets[0].Source))
-	assert.Check(t, is.Equal("DATABASE_PASSWORD", service.Sensitive[0].Secrets[0].Name))
-	assert.Check(t, is.Equal("api_key", service.Sensitive[0].Secrets[1].Source))
-	assert.Check(t, is.Equal("API_KEY", service.Sensitive[0].Secrets[1].Name))
-	assert.Check(t, is.Equal("1000", service.Sensitive[0].UID))
-	assert.Check(t, is.Equal("1000", service.Sensitive[0].GID))
+	assert.Check(t, is.Equal("/app/.env", service.Sensitive["app_env"].Target))
+	assert.Check(t, is.Equal("env", service.Sensitive["app_env"].Format))
+	assert.Check(t, is.Len(service.Sensitive["app_env"].Secrets, 2))
+	assert.Check(t, is.Equal("db_password", service.Sensitive["app_env"].Secrets[0].Source))
+	assert.Check(t, is.Equal("DATABASE_PASSWORD", service.Sensitive["app_env"].Secrets[0].Name))
+	assert.Check(t, is.Equal("api_key", service.Sensitive["app_env"].Secrets[1].Source))
+	assert.Check(t, is.Equal("API_KEY", service.Sensitive["app_env"].Secrets[1].Name))
+	assert.Check(t, is.Equal("1000", service.Sensitive["app_env"].UID))
+	assert.Check(t, is.Equal("1000", service.Sensitive["app_env"].GID))
 
 	// Second sensitive config (raw format)
-	assert.Check(t, is.Equal("/run/secrets/postgres_password", service.Sensitive[1].Target))
-	assert.Check(t, is.Equal("raw", service.Sensitive[1].Format))
-	assert.Check(t, is.Len(service.Sensitive[1].Secrets, 1))
-	assert.Check(t, is.Equal("db_password", service.Sensitive[1].Secrets[0].Source))
-	assert.Check(t, is.Equal("999", service.Sensitive[1].UID))
+	assert.Check(t, is.Equal("/run/secrets/postgres_password", service.Sensitive["postgres_password"].Target))
+	assert.Check(t, is.Equal("raw", service.Sensitive["postgres_password"].Format))
+	assert.Check(t, is.Len(service.Sensitive["postgres_password"].Secrets, 1))
+	assert.Check(t, is.Equal("db_password", service.Sensitive["postgres_password"].Secrets[0].Source))
+	assert.Check(t, is.Equal("999", service.Sensitive["postgres_password"].UID))
 }
 
 func TestLoadCicdezFieldsCombined(t *testing.T) {
@@ -158,10 +162,12 @@ services:
           - name: Run tests
             command: go test ./...
     local_configs:
-      - source: ./configs/app.conf
+      app_conf:
+        source: ./configs/app.conf
         target: /etc/app/app.conf
     sensitive:
-      - target: /app/.env
+      app_env:
+        target: /app/.env
         format: env
         secrets:
           - source: app_secret
@@ -179,6 +185,6 @@ services:
 
 	// Quick sanity checks
 	assert.Check(t, is.Equal("Tests", service.Prebuild[0].Name))
-	assert.Check(t, is.Equal("./configs/app.conf", service.LocalConfigs[0].Source))
-	assert.Check(t, is.Equal("/app/.env", service.Sensitive[0].Target))
+	assert.Check(t, is.Equal("./configs/app.conf", service.LocalConfigs["app_conf"].Source))
+	assert.Check(t, is.Equal("/app/.env", service.Sensitive["app_env"].Target))
 }

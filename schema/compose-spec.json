@@ -208,9 +208,12 @@
           "description": "Grant access to Configs on a per-service basis."
         },
         "local_configs": {
-          "type": "array",
+          "type": "object",
           "description": "Local file configs managed by cicdez. These are read from local files and created as versioned Docker configs automatically.",
-          "items": {"$ref": "#/definitions/local_config"}
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {"$ref": "#/definitions/local_config"}
+          },
+          "additionalProperties": false
         },
         "container_name": {
           "type": "string",
@@ -756,9 +759,12 @@
           "description": "Grant access to Secrets on a per-service basis."
         },
         "sensitive": {
-          "type": "array",
+          "type": "object",
           "description": "Manages how secrets are injected into containers with custom formatting.",
-          "items": {"$ref": "#/definitions/sensitive_config"}
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {"$ref": "#/definitions/sensitive_config"}
+          },
+          "additionalProperties": false
         },
         "sysctls": {
           "$ref": "#/definitions/list_or_dict",
