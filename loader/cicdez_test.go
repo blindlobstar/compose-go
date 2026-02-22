@@ -147,6 +147,36 @@ services:
 	assert.Check(t, is.Equal("999", service.Sensitive["postgres_password"].UID))
 }
 
+func TestLoadSensitiveDefaultTarget(t *testing.T) {
+	actual, err := loadYAML(`
+name: test-sensitive-default-target
+services:
+  db:
+    image: postgres:15
+    sensitive:
+      admin_password:
+        format: raw
+        secrets:
+          - source: db_password
+      db_credentials:
+        format: env
+        secrets:
+          - source: db_user
+            name: DB_USER
+          - source: db_password
+            name: DB_PASSWORD
+`)
+	assert.NilError(t, err)
+	assert.Check(t, is.Len(actual.Services, 1))
+
+	service := actual.Services["db"]
+	assert.Check(t, is.Len(service.Sensitive, 2))
+
+	// Verify default target is /run/secrets/{name}
+	assert.Check(t, is.Equal("/run/secrets/admin_password", service.Sensitive["admin_password"].Target))
+	assert.Check(t, is.Equal("/run/secrets/db_credentials", service.Sensitive["db_credentials"].Target))
+}
+
 func TestLoadCicdezFieldsCombined(t *testing.T) {
 	actual, err := loadYAML(`
 name: test-all-cicdez-fields

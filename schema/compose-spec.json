@@ -2003,7 +2003,7 @@
           "description": "File permissions (e.g., 0440)."
         }
       },
-      "required": ["target", "secrets"],
+      "required": ["secrets"],
       "additionalProperties": false,
       "patternProperties": {"^x-": {}}
     },
